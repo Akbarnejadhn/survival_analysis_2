@@ -447,6 +447,43 @@ ggsurvplot(survfit(Surv(time, delta) ~ race+gender, data = kidtran_data, subset 
 <p>Comparing survival of male subjects, we can observe that p-value is 0.8 which is greater than 0.05. This means that we fail to reject H_0 and conclude that there is no statistically significant difference in survival of white men versus black men. We can also observe that in the plot that shows survival plot of different races in male subjects, the curve are pretty close to each other.</p>
 <p>However, this p-value is 0.03 for female subjects, which means that we should reject null hypothesis and conclude that there is a statistically meaningful difference in survival of white versus black females. this difference is also reflected in survival plot and we can see that survival of black women is significantly lower than white women throught the study.</p>
 </div>
+<div id="proportional-hazardsph-model-survival-of-different-stages-of-larynx-cancer-patients" class="section level3">
+<h3>Proportional Hazards(PH) Model, survival of different stages of Larynx Cancer patients</h3>
+<pre class="r"><code>data(&quot;larynx&quot;)
+larynx_data = larynx %&gt;% 
+  mutate(
+    z1 = if_else(stage == 2, 1, 0),
+    z2 = if_else(stage == 3, 1, 0),
+    z3 = if_else(stage == 4, 1, 0),
+    z4 = age,
+    z1 = as.factor(z1),
+    z2 = as.factor(z2),
+    z3 = as.factor(z3),
+  ) %&gt;% 
+  select(time, diagyr, delta, z1:z4)
+
+ph_fir = coxph(Surv(time,delta)~z1+z2+z3+z4+z1*z4,data=larynx_data,ties=&#39;breslow&#39;)
+ph_fir</code></pre>
+<pre><code>## Call:
+## coxph(formula = Surv(time, delta) ~ z1 + z2 + z3 + z4 + z1 * 
+##     z4, data = larynx_data, ties = &quot;breslow&quot;)
+## 
+##              coef  exp(coef)   se(coef)      z        p
+## z11    -7.3820143  0.0006223  3.4027542 -2.169   0.0301
+## z21     0.6218044  1.8622853  0.3558078  1.748   0.0805
+## z31     1.7534270  5.7743576  0.4239595  4.136 3.54e-05
+## z4      0.0059729  1.0059908  0.0148792  0.401   0.6881
+## z11:z4  0.1116674  1.1181409  0.0476728  2.342   0.0192
+## 
+## Likelihood ratio test=24.11  on 5 df, p=0.0002068
+## n= 90, number of events= 50</code></pre>
+<p>The model is: <span class="math inline">\(h_i(t)=h_0(t) e^{\beta_1 Z_1 + \beta_2 Z_2 + \beta_3 Z_3 + \beta_4 Z_4 + \beta_5 Z1 * Z4 }\)</span></p>
+<p><span class="math display">\[h_i(t)=h_0(t) e^{-7.38Z_1 + 0.62Z_2 + 1.75Z_3 + 0.006 Z_4 + 0.11Z1 *  Z4 }\]</span></p>
+<p><span class="math inline">\(\beta_1 + \beta_5:\)</span> The log hazard ratio of time to death or censoring between participants in stageII versus those in stageI is -7.27 (-7.38 + 0.11), for a specific age(?).</p>
+<p><span class="math inline">\(\beta_2:\)</span> The log hazard ratio of time to death or censoring between participants in stageIII versus those in stageI is 0.62, holding age constant.</p>
+<p><span class="math inline">\(\beta_3:\)</span> The log hazard ratio of time to death or censoring between participants in stageIV versus those in stageI is 1.75, holding age constant.</p>
+<p><span class="math inline">\(\beta_4:\)</span></p>
+</div>
 
 
 
