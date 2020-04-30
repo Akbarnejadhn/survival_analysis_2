@@ -35,3 +35,40 @@ ggsurvplot( survfit(Surv(time, delta) ~ group, data = surv_data), conf.int=TRUE)
 We want to test $H_0: h_1(t) = h_2(t)$ versus $H_1:h_1(t) \neq h_2(t)$.
 
 The output of log rank test (*survdiff()* function) shows that p-value is 0.3 which is smaller than 0.05. This means that we fail to reject $H_0$ and conclude that $h_1(t) = h_2(t)$, i.e. hazard function of two groups are not statstically significantly different from each other.
+
+### Comparing death times of kidney transplant patients in different race/sex groups
+```{r}
+data("kidtran")
+kidtran_data = kidtran %>% 
+  mutate(
+    gender = as.factor(gender),
+    race = as.factor(race)
+  )
+
+# levels(kidtran_data$gender)  #1:Male, 2:Female
+# levels(kidtran_data$race)    #1:white, 2: black
+
+# Surv(kidtran_data$time, kidtran_data$delta,type='right')
+
+#survfit(Surv(time, delta) ~ gender + race, data = kidtran_data)
+
+ggsurvplot(survfit(Surv(time, delta) ~ gender + race, data = kidtran_data), conf.int=FALSE)
+
+# male model
+male_surv = survdiff(Surv(time, delta)~ gender + race, data = kidtran_data, subset = (gender == 1))
+male_surv
+#female model
+female_surv = survdiff(Surv(time, delta)~ gender + race, data = kidtran_data, subset = (gender == 2))
+female_surv
+
+#male plot
+ggsurvplot(survfit(Surv(time, delta) ~ race+gender, data = kidtran_data, subset = (gender == 1) ), conf.int=FALSE)
+#female plot
+ggsurvplot(survfit(Surv(time, delta) ~ race+gender, data = kidtran_data, subset = (gender == 2) ), conf.int=FALSE)
+```
+
+Comparing survival of male subjects, we can observe that p-value is 0.8 which is greater than 0.05. This means that we fail to reject H_0 and conclude that there is no statistically significant difference in survival of white men versus black men. We can also observe that in the plot that shows survival plot of different races in male subjects, the curve are pretty close to each other.
+
+However, this p-value is 0.03 for female subjects, which means that we should reject null hypothesis and conclude that there is a statistically meaningful difference in survival of white versus black females. this difference is also reflected in survival plot and we can see that survival of black women is significantly lower than white women throught the study.
+
+
