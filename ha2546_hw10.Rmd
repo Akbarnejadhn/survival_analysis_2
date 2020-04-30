@@ -1,0 +1,37 @@
+---
+title: "Survival Analysis; Hypothesis testing and Regression"
+author: "Hana Akbarnejad"
+date: "4/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(survival)
+library(KMsurv)
+library(survminer)
+```
+
+
+### Hypothesis Testing: Log-rank Test to compare hazard functions between two groups
+```{r}
+# creating data frame...
+surv_data = 
+  tibble (
+    time = c(4, 12, 15, 21, 23, 2, 6, 8, 10, 19),
+    delta = c(1, 0, 1, 0, 1, 1, 0, 0, 1, 1), #0:censored, 1:event
+    group = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 2)
+  )
+
+#log rank test
+survdiff(Surv(time,delta)~group, data=surv_data)
+
+#plotting
+plot(survfit(Surv(time,delta)~group, data = surv_data)) 
+ggsurvplot( survfit(Surv(time, delta) ~ group, data = surv_data), conf.int=TRUE)
+```
+
+We want to test $H_0: h_1(t) = h_2(t)$ versus $H_1:h_1(t) \neq h_2(t)$.
+
+The output of log rank test (*survdiff()* function) shows that p-value is 0.3 which is smaller than 0.05. This means that we fail to reject $H_0$ and conclude that $h_1(t) = h_2(t)$, i.e. hazard function of two groups are not statstically significantly different from each other.
