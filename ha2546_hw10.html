@@ -462,16 +462,16 @@ larynx_data = larynx %&gt;%
   ) %&gt;% 
   select(time, diagyr, delta, z1:z4)
 
-ph_fir = coxph(Surv(time,delta)~z1+z2+z3+z4+z1*z4,data=larynx_data,ties=&#39;breslow&#39;)
+ph_fir = coxph(Surv(time,delta)~z2+z3+z1*z4,data=larynx_data,ties=&#39;breslow&#39;)
 ph_fir</code></pre>
 <pre><code>## Call:
-## coxph(formula = Surv(time, delta) ~ z1 + z2 + z3 + z4 + z1 * 
-##     z4, data = larynx_data, ties = &quot;breslow&quot;)
+## coxph(formula = Surv(time, delta) ~ z2 + z3 + z1 * z4, data = larynx_data, 
+##     ties = &quot;breslow&quot;)
 ## 
 ##              coef  exp(coef)   se(coef)      z        p
-## z11    -7.3820143  0.0006223  3.4027542 -2.169   0.0301
 ## z21     0.6218044  1.8622853  0.3558078  1.748   0.0805
 ## z31     1.7534270  5.7743576  0.4239595  4.136 3.54e-05
+## z11    -7.3820143  0.0006223  3.4027542 -2.169   0.0301
 ## z4      0.0059729  1.0059908  0.0148792  0.401   0.6881
 ## z11:z4  0.1116674  1.1181409  0.0476728  2.342   0.0192
 ## 
@@ -479,10 +479,19 @@ ph_fir</code></pre>
 ## n= 90, number of events= 50</code></pre>
 <p>The model is: <span class="math inline">\(h_i(t)=h_0(t) e^{\beta_1 Z_1 + \beta_2 Z_2 + \beta_3 Z_3 + \beta_4 Z_4 + \beta_5 Z1 * Z4 }\)</span></p>
 <p><span class="math display">\[h_i(t)=h_0(t) e^{-7.38Z_1 + 0.62Z_2 + 1.75Z_3 + 0.006 Z_4 + 0.11Z1 *  Z4 }\]</span></p>
-<p><span class="math inline">\(\beta_1 + \beta_5:\)</span> The log hazard ratio of time to death or censoring between participants in stageII versus those in stageI is -7.27 (-7.38 + 0.11), for a specific age(?).</p>
+<p><span class="math inline">\(\beta_1 + \beta_5:\)</span> The log hazard ratio of time to death or censoring (Is this right?) between participants in stageII versus those in stageI is -7.27 (0.11-7.38), for a specific age(?).</p>
 <p><span class="math inline">\(\beta_2:\)</span> The log hazard ratio of time to death or censoring between participants in stageIII versus those in stageI is 0.62, holding age constant.</p>
 <p><span class="math inline">\(\beta_3:\)</span> The log hazard ratio of time to death or censoring between participants in stageIV versus those in stageI is 1.75, holding age constant.</p>
-<p><span class="math inline">\(\beta_4:\)</span></p>
+<p><span class="math inline">\(\beta_4 + \beta_5:\)</span> The log hazard ratio of time to death or censoring for participants in stageII versus is 0.116 (0.11+ 0.006), per 1 unit increase in age.</p>
+<p>(I think!) when we include interaction term we shouldn’t interpret individual effects. &gt; check interpretations!</p>
+<ul>
+<li>What is the relative risk of dying for a stage II patient of age 50 as compared to a stage I patient of the same age?</li>
+</ul>
+<p>For the hazards of ??? for a stage II patient of age 50 is:</p>
+<p><span class="math display">\[h_2(t) = h_0(t) \times exp(−7.38 × 1 + 0.11 × 1 × 50)\]</span></p>
+<p>For the hazard of dying for a stage I patient of age 50 is:</p>
+<p><span class="math display">\[h_1(t) = h_0(t)exp(0)\]</span></p>
+<p>So, the hazard ratio: <span class="math inline">\(HR(t) = \frac{h_2(t)}{h_1(t)} = 0.16\)</span></p>
 </div>
 
 
